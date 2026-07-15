@@ -19,7 +19,8 @@ public class AddonTemplate extends MeteorAddon {
     public static final HudGroup HUD_GROUP = new HudGroup("Example");
 
     @Override
-    public void onInitialize() {
+    public void onInitialize() {Modules.register(new AutoShopOrder());
+
         LOG.info("Initializing Meteor Addon Template");
 
         // Modules
