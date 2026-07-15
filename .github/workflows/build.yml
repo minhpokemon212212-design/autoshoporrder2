@@ -1,0 +1,21 @@
+name: Build Addon
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cài Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Cấp quyền chạy
+        run: chmod +x gradlew
+      - name: Biên dịch addon
+        run: ./gradlew build
+      - name: Tải file kết quả
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoShopAddon
+          path: build/libs/*.jar
