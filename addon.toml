@@ -1,0 +1,10 @@
+[addon]
+name = "Shop Automation"
+author = "Your Name"
+summary = "Tự động hóa quy trình mua hàng"
+description = "Tự động: /shop → chọn địa ngục → mua → /order → đưa hàng"
+version = "1.0.0"
+entry = "me.addon.ShopAutomationAddon"
+
+[java]
+package = "me.addon"
