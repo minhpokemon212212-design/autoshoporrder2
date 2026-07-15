@@ -6,7 +6,6 @@ import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import net.minecraft.screen.ScreenHandlerType;
@@ -19,7 +18,6 @@ public class AutoShopOrder extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
-    // Cấu hình chính
     private final Setting<Integer> slotDiaNguc = sgGeneral.add(new IntSetting.Builder()
         .name("vị-trí-mục-địa-ngục")
         .description("Khe mở mục Địa Ngục (đếm từ 0)")
@@ -67,7 +65,6 @@ public class AutoShopOrder extends Module {
         .build()
     );
 
-    // Trạng thái chạy
     private int buoc = 0;
     private int demLay = 0;
     private int demAnMua = 0;
@@ -90,14 +87,11 @@ public class AutoShopOrder extends Module {
         if (demLay > 0) { demLay--; return; }
 
         switch (buoc) {
-            // B1: Gửi lệnh /shop
             case 1 -> {
                 ChatUtils.sendCommand("shop");
                 demLay = doTre.get();
                 buoc = 2;
             }
-
-            // B2: Chọn mục Địa Ngục
             case 2 -> {
                 if (mc.currentScreen instanceof GenericContainerScreen s) {
                     clickKhe(s, slotDiaNguc.get());
@@ -105,8 +99,6 @@ public class AutoShopOrder extends Module {
                     buoc = 3;
                 }
             }
-
-            // B3: Chọn Que Quỷ Lửa
             case 3 -> {
                 if (mc.currentScreen instanceof GenericContainerScreen s) {
                     clickKhe(s, slotQueQuyLua.get());
@@ -114,8 +106,6 @@ public class AutoShopOrder extends Module {
                     buoc = 4;
                 }
             }
-
-            // B4+B5: Ấn mua đủ số lần
             case 4 -> {
                 if (mc.currentScreen instanceof GenericContainerScreen s) {
                     if (demAnMua < soLanAnMua.get()) {
@@ -129,32 +119,23 @@ public class AutoShopOrder extends Module {
                     }
                 }
             }
-
-            // B6: Thoát menu
             case 5 -> {
                 if (mc.currentScreen != null) mc.currentScreen.close();
                 demLay = doTre.get();
                 buoc = 6;
             }
-
-            // B7: Gửi lệnh /order tìm đơn
             case 6 -> {
                 String ten = tenTimKiem.get().trim();
                 if (!ten.isEmpty()) ChatUtils.sendCommand("order " + ten);
                 demLay = doTre.get();
                 buoc = 7;
             }
-
-            // B8: Chọn đơn hàng gần nhất (trái sang phải, trên xuống dưới)
             case 7 -> {
                 if (mc.currentScreen instanceof GenericContainerScreen s) {
-                    boolean daChon = false;
-                    // Quét từ khe 0 đến hết, chọn cái đầu tiên khớp
                     for (int i = 0; i < s.getScreenHandler().slots.size(); i++) {
                         ItemStack vatPham = s.getScreenHandler().getSlot(i).getStack();
                         if (!vatPham.isEmpty()) {
                             clickKhe(s, i);
-                            daChon = true;
                             break;
                         }
                     }
@@ -162,11 +143,8 @@ public class AutoShopOrder extends Module {
                     buoc = 8;
                 }
             }
-
-            // B9: Nạp toàn bộ vật phẩm từ túi vào đơn
             case 8 -> {
                 if (mc.currentScreen instanceof GenericContainerScreen s) {
-                    // Đưa tất cả vật phẩm từ túi vào ô nhận đơn
                     for (int i = 0; i < 36; i++) {
                         InvUtils.quickMove(s.getScreenHandler().syncId, i + s.getScreenHandler().slots.size() - 36);
                     }
@@ -175,18 +153,15 @@ public class AutoShopOrder extends Module {
                     buoc = 9;
                 }
             }
-
-            // B10: Thoát và lặp lại từ đầu
             case 9 -> {
                 if (mc.currentScreen != null) mc.currentScreen.close();
                 demLay = doTre.get();
-                buoc = 1; // Quay lại B1 lặp vô hạn
+                buoc = 1;
                 info("Bắt đầu vòng lặp mới...");
             }
         }
     }
 
-    // Hàm nhấn khe giao diện
     private void clickKhe(GenericContainerScreen s, int maKhe) {
         Objects.requireNonNull(mc.interactionManager).clickSlot(
             s.getScreenHandler().syncId, maKhe, 0,
